@@ -1,17 +1,37 @@
 <template>
-  <div>
-    <NavBar />
-    <router-view />
+  <div id="app">
+    <div>
+      <NavBar />
+      <router-view />
+    </div>
+    <div class="hello-world">
+      <img alt="Vue logo" src="./assets/logo.png" />
+      <div class="hello-world__message">
+        {{ message }}
+      </div>
+    </div>
+    <TodoList></TodoList>
+    <Counter v-bind:initialValue="1000"></Counter>
   </div>
 </template>
 
 <script>
 import NavBar from "@/components/NavBar.vue"
-
+import TodoList from "@/components/TodoList.vue"
+import Counter from "@/components/Counter.vue"
 export default {
+  name: "App",
   components: {
+    TodoList,
+    Counter,
     NavBar,
   },
+  data: function () {
+    return {
+      message: "WebExpert Course Vue Template",
+    }
+  },
+  methods: {},
 }
 </script>
 
@@ -21,5 +41,22 @@ export default {
 }
 body {
   margin: 0;
+}
+
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+</style>
+
+<style scoped>
+.hello-world {
+  margin-top: 60px;
+  text-align: center;
+}
+
+.hello-world .hello-world__message {
+  color: #2c3e50;
 }
 </style>
