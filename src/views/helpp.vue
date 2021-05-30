@@ -1,13 +1,13 @@
 <template>
   <div class="home__wrapper">
-    <TodoList />
+    <Helpnav />
   </div>
 </template>
 
 <script>
-import TodoList from "@/components/TodoList.vue"
+import Helpnav from "@/components/help.vue"
 export default {
-  components: { TodoList },
+  components: { Helpnav },
 }
 </script>
 

@@ -1,24 +1,25 @@
 <template>
   <div class="todolist">
-    <div>Todoリスト</div>
+    <div>買い物リスト</div>
     <div>
       <div v-for="(todo, index) in todos" v-bind:key="index" class="todo">
         <div class="todo__checkbox">
           <input type="checkbox" v-model="todo.isDone" />
         </div>
         <div v-if="todo.isDone" class="todo__text todo__text--done">
-          {{ index }}:{{ todo.text }}
+          {{ index + 1 }} : {{ todo.text }}
         </div>
-        <div v-else class="todo__text">{{ index }}:{{ todo.text }}</div>
+        <div v-else class="todo__text">{{ index + 1 }} : {{ todo.text }}</div>
         <div v-on:click="deleteTodo(index)" class="todo__delete">削除</div>
       </div>
     </div>
     <div>
       <div>
-        <input type="text" v-model="inputTodo" />
-        <div v-on:click="addTodo">追加</div>
+        <input type="text" v-model="inputTodo" class="input-todo" />
+        <div v-on:click="addTodo" class="todo_add">追加</div>
       </div>
     </div>
+    <div>{{ todos }}</div>
   </div>
 </template>
 
@@ -26,27 +27,30 @@
 export default {
   data() {
     return {
-      inputTodo: "",
+      inputTodo: "入力してね",
       todos: [
         {
-          text: "ひき肉を300g買う",
-          isDone: false,
-        },
-        {
-          text: "ホウレンソウを1束買う",
-          isDone: false,
-        },
-        {
-          text: "ピーマンを2個買う",
+          text: "買いたいもの",
           isDone: false,
         },
       ],
     }
   },
+  // watch: {
+  //   list: function () {
+  //     localStorage.list = JSON.stringify(this.list)
+  //   },
+  // },
+  // created: function () {
+  //   if (localStorage.list) {
+  //     this.list = JSON.parse(localStorage.list)
+  //   }
+  // },
   methods: {
     addTodo() {
-      if (this.inputTodo !== "") {
-        this.todos.push(this.inputTodo)
+      if (this.inputTodo !== "入力してね") {
+        this.todos.push({ text: this.inputTodo, isDone: false })
+        this.todos.isDone.push("false")
       }
     },
     deleteTodo(index) {
@@ -79,8 +83,8 @@ export default {
 }
 
 .todo__text {
-  margin-left: 2rem;
-  text-align: left;
+  margin-left: 1rem;
+  /* text-align: left; */
 }
 
 .todo__text--done {
@@ -93,6 +97,12 @@ export default {
 }
 
 .todo__delete:hover {
+  margin-left: 2rem;
+  background-color: #b2ae3b;
+  border-radius: 5px;
+}
+
+.todo_add {
   margin-left: 2rem;
   background-color: #b2ae3b;
   border-radius: 5px;

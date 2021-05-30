@@ -1,5 +1,12 @@
 <template>
-  <div class="about">
-    <h1>This is an about page</h1>
+  <div class="home__wrapper">
+    <Calender />
   </div>
 </template>
+
+<script>
+import Calender from "@/components/Calender.vue"
+export default {
+  components: { Calender },
+}
+</script>
