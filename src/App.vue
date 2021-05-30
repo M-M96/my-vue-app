@@ -1,49 +1,25 @@
 <template>
-  <div id="app">
-    <div class="hello-wrold">
-      <img alt="Vue logo" src="./assets/logo.png" />
-      <div class="hello-wrold__message">
-        {{ message }}
-      </div>
-    </div>
-    <TodoList></TodoList>
-    <Counter v-bind:initialValue="1000"></Counter>
+  <div>
+    <NavBar />
+    <router-view />
   </div>
 </template>
 
 <script>
-import TodoList from "@/components/TodoList.vue"
-import Counter from "@/components/Counter.vue"
+import NavBar from "@/components/NavBar.vue"
+
 export default {
-  name: "App",
   components: {
-    TodoList,
-    Counter,
+    NavBar,
   },
-  data: function () {
-    return {
-      message: "WebExpert Course Vue Template",
-    }
-  },
-  methods: {},
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+* {
+  box-sizing: border-box;
 }
-</style>
-
-<style scoped>
-.hello-wrold {
-  margin-top: 60px;
-  text-align: center;
-}
-
-.hello-wrold .hello-world__message {
-  color: #2c3e50;
+body {
+  margin: 0;
 }
 </style>
