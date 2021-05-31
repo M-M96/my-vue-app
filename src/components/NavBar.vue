@@ -1,12 +1,13 @@
 <template>
   <div class="nav__bar">
-    <router-link to="/" class="nav__logo nav__link">買い物memo</router-link>
+    <!-- <router-link to="/" class="nav__logo nav__link">買い物memo</router-link> -->
     <div class="nav__items">
       <router-link to="/about" class="nav__item nav__link"
-        >calender</router-link
+        >Calendar</router-link
       >
-      <router-link to="/memo" class="nav__item nav__link"> memo </router-link>
-      <router-link to="/help" class="nav__item nav__link"> help </router-link>
+      <router-link to="/" class="nav__item nav__link">Check List</router-link>
+      <router-link to="/memo" class="nav__item nav__link"> Memo </router-link>
+      <router-link to="/help" class="nav__item nav__link"> Help </router-link>
     </div>
   </div>
 </template>
