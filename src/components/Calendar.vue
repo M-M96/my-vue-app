@@ -1,43 +1,55 @@
 <template>
-  <div id="content">
-    <h2>カレンダー{{ displayDate }}</h2>
-    <div id="button-area">
-      <button class="button" @click="prevMonth">前の月</button>
-      <button class="button" @click="nextMonth">次の月</button>
+  <div id="calendar-app">
+    <div id="input">
+      <input
+        type="text"
+        v-model="inputcal"
+        placeholder="入力してね"
+        class="input-cal"
+      />
+      <div v-on:click="addcal" class="cal-add">追加</div>
+      <div>{{ events }}</div>
     </div>
-    <div id="CAL">
-      <div class="CAL-weekly">
-        <div class="CAL-youbi" v-for="n in 7" v-bind:key="n">
-          {{ youbi(n - 1) }}
-        </div>
+    <div id="content">
+      <div id="button-area">
+        <button class="button" @click="prevMonth">＜</button>
+        <h2>カレンダー{{ displayDate }}</h2>
+        <button class="button" @click="nextMonth">＞</button>
       </div>
-      <div
-        class="CAL-weekly"
-        v-for="(week, index) in calendars"
-        v-bind:key="index"
-      >
-        <div
-          class="CAL-daily"
-          :class="{ outside: currentMonth !== day.month }"
-          v-for="(day, index) in week"
-          v-bind:key="index"
-          @drop="dragEnd($event, day.date)"
-          @dragover.prevent
-        >
-          <div class="CAL-day">
-            {{ day.day }}
+      <div id="CAL">
+        <div class="CAL-weekly">
+          <div class="CAL-youbi" v-for="n in 7" v-bind:key="n">
+            {{ youbi(n - 1) }}
           </div>
-          <div v-for="dayEvent in day.dayEvents" v-bind:key="dayEvent.id">
-            <div
-              class="CAL-event"
-              v-if="dayEvent.width"
-              :style="`width:${dayEvent.width}%;background-color:${dayEvent.color}`"
-              draggable="true"
-              @dragstart="dragStart($event, dayEvent.id)"
-            >
-              {{ dayEvent.name }}
+        </div>
+        <div
+          class="CAL-weekly"
+          v-for="(week, index) in calendars"
+          v-bind:key="index"
+        >
+          <div
+            class="CAL-daily"
+            :class="{ outside: currentMonth !== day.month }"
+            v-for="(day, index) in week"
+            v-bind:key="index"
+            @drop="dragEnd($event, day.date)"
+            @dragover.prevent
+          >
+            <div class="CAL-day">
+              {{ day.day }}
             </div>
-            <div v-else style="height: 26px"></div>
+            <div v-for="dayEvent in day.dayEvents" v-bind:key="dayEvent.id">
+              <div
+                class="CAL-event"
+                v-if="dayEvent.width"
+                :style="`width:${dayEvent.width}%;background-color:${dayEvent.color}`"
+                draggable="true"
+                @dragstart="dragStart($event, dayEvent.id)"
+              >
+                {{ dayEvent.name }}
+              </div>
+              <div v-else style="height: 26px"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -50,6 +62,7 @@ import moment from "moment"
 export default {
   data() {
     return {
+      inputcal: "",
       currentDate: moment(),
       events: [
         {
@@ -70,6 +83,11 @@ export default {
     }
   },
   methods: {
+    addcal() {
+      if (this.inputcal !== "") {
+        this.events.push({ name: this.inputcal })
+      }
+    },
     prevMonth() {
       this.currentDate = moment(this.currentDate.subtract(1, "month"))
     },
@@ -229,20 +247,31 @@ export default {
 
 <style scoped>
 #content {
-  margin: 2rem auto;
-  width: 900px;
+  margin: auto 1rem 1rem 0;
+  width: 700px;
+  height: 700px;
 }
 #button-area {
-  margin: 0.5rem 0;
+  display: flex;
+  background-color: rgba(138, 41, 228, 0.699);
+  justify-content: space-between;
+  color: white;
 }
 
 .button {
-  padding: 4px 8px;
-  margin-right: 8px;
+  font-size: 20px;
+  border: none;
+  background: none;
+  width: 50px;
+  color: white;
+}
+
+.button:hover {
+  font-size: 30px;
 }
 
 #CAL {
-  max-width: 900px;
+  max-width: 700px;
   border-top: 1px solid #e0e0e0;
 }
 
@@ -253,7 +282,7 @@ export default {
 .CAL-daily {
   flex: 1;
   /* text-align: center; */
-  min-height: 125px;
+  min-height: 85px;
   border-right: 1px solid #e0e0e0;
   border-bottom: 1px solid #e0e0e0;
   margin-right: -1px;
@@ -266,6 +295,8 @@ export default {
   border-right: 1px solid #e0e0e0;
   margin-right: -1px;
   text-align: center;
+  background-color: rgb(147, 236, 225);
+  padding-top: 5px;
 }
 .outside {
   background-color: #f7f7f7;
