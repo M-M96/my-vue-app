@@ -2,6 +2,7 @@ import Vue from "vue"
 import VueRouter from "vue-router"
 import Home from "../views/Home.vue"
 // import Help from "../views/helpp.vue"
+// import Memo from "../views/memo.vue"
 
 Vue.use(VueRouter)
 

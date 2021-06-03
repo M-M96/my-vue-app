@@ -3,16 +3,32 @@
     <div id="list">
       <slot></slot>
       <draggable v-model="todos" draggable=".todo">
-        <div class="todo" v-for="(todo, index) in todos" v-bind:key="index">
-          <div class="todo__checkbox">
-            <input type="checkbox" v-model="todo.isDone" />
-          </div>
-          <div class="todo__text todo__text--done" v-if="todo.isDone">
-            {{ index + 1 }} : {{ todo.text }}
-          </div>
-          <div v-else class="todo__text">{{ index + 1 }} : {{ todo.text }}</div>
-          <div class="todo_delete" v-on:click="deleteTodo(index)"></div>
-        </div>
+        <ul v-if="todos.length">
+          <li class="todo" v-for="(todo, index) in todos" v-bind:key="index">
+            <div v-if="!todo.todoShow" v-on:click="todo.todoShow = true">
+              <div class="todo__checkbox">
+                <input type="checkbox" v-model="todo.isDone" />
+              </div>
+              <div class="todo__text todo__text--done" v-if="todo.isDone">
+                {{ index + 1 }} : {{ todo.text }}
+              </div>
+              <div v-else class="todo__text">
+                {{ index + 1 }} : {{ todo.text }}
+              </div>
+              <div class="todo_delete" v-on:click="deleteTodo(index)"></div>
+            </div>
+            <div v-else>
+              <input
+                type="text"
+                v-model="todo.text"
+                v-on:keydown.enter="todo.todoShow = false"
+              />
+            </div>
+          </li>
+        </ul>
+        <ul v-else>
+          <li style="list-style: none">ないよ</li>
+        </ul>
         <div>
           <div class="add">
             <input
@@ -20,7 +36,7 @@
               type="text"
               placeholder="入力"
               v-model="inputTodo"
-              v-on:keydown.enter="addTodoenter"
+              v-on:keydown.enter="addTodo"
             />
             <div class="todo_add" v-on:click="addTodo">追加</div>
           </div>
@@ -39,12 +55,7 @@ export default {
   data() {
     return {
       inputTodo: "",
-      todos: [
-        {
-          text: "りんご",
-          isDone: false,
-        },
-      ],
+      todos: [],
     }
   },
   // watch: {
@@ -58,15 +69,13 @@ export default {
   //   }
   // },
   methods: {
-    addTodoenter: (e) => {
-      if (e.keycode !== 13 && this.inputTodo !== "") {
-        console.log("キー")
-        // this.todos.push({ text: this.inputTodo, isDone: false })
-      }
-    },
     addTodo() {
       if (this.inputTodo !== "") {
-        this.todos.push({ text: this.inputTodo, isDone: false })
+        this.todos.push({
+          text: this.inputTodo,
+          isDone: false,
+          todoShow: false,
+        })
       }
     },
     deleteTodo(index) {
@@ -84,6 +93,10 @@ export default {
   border-radius: 4px;
   background-color: #e2e4e6;
   margin: 1rem;
+}
+
+ul {
+  padding: 0;
 }
 
 .todo,

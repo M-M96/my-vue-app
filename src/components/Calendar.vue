@@ -34,6 +34,8 @@
             v-bind:key="index"
             @drop="dragEnd($event, day.date)"
             @dragover.prevent
+            @click="GET(day.date)"
+            @dblclick="GET2(day.date)"
           >
             <div class="CAL-day">
               {{ day.day }}
@@ -83,6 +85,14 @@ export default {
     }
   },
   methods: {
+    GET(date) {
+      console.log(date)
+      this.events.push({ start: date })
+    },
+    GET2(date) {
+      console.log(date)
+      this.events.push({ end: date })
+    },
     addcal() {
       if (this.inputcal !== "") {
         this.events.push({ name: this.inputcal })
@@ -290,6 +300,11 @@ export default {
 .CAL-day {
   text-align: center;
 }
+
+.CAL-day:hover {
+  background-color: blue;
+}
+
 .CAL-youbi {
   flex: 1;
   border-right: 1px solid #e0e0e0;
