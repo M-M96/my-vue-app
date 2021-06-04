@@ -1,29 +1,6 @@
 <template>
   <div id="checklist">
-    <div id="todo">
-      <div class="todolist" v-for="(list, index) in lists" v-bind:key="index">
-        <button v-on:click="list.show = !list.show">{{ list.category }}</button>
-        <div v-if="list.show">
-          <div v-if="!list.inputShow" v-on:click="list.inputShow = true">
-            <div class="listcate">
-              {{ list.category }}
-              <div class="list-delete" v-on:click="deleteList(index)"></div>
-            </div>
-          </div>
-          <div v-else>
-            <input
-              type="text"
-              v-model="list.category"
-              v-on:keydown.enter="list.inputShow = false"
-            />
-          </div>
-          <TodoList></TodoList>
-        </div>
-        <div v-else></div>
-      </div>
-    </div>
-
-    <div class="input-container">
+    <div id="input-container">
       <div class="input-cate" v-if="!inputCate" v-on:click="inputCate = true">
         カテゴリー追加
       </div>
@@ -35,12 +12,35 @@
           v-model="inputList"
           v-on:keydown.enter="addList"
         />
-        <div class="lisbutton">
-          <button class="list-button" v-on:click="addList">追加</button>
-          <button class="list-button" v-on:click="inputCate = false">
-            キャンセル
-          </button>
+        <button class="add-button" v-on:click="addList">追加</button>
+        <button class="cancel-button" v-on:click="inputCate = false">
+          キャンセル
+        </button>
+      </div>
+    </div>
+    <div id="todo">
+      <div class="todolist" v-for="(list, index) in lists" v-bind:key="index">
+        <button class="show-button" v-on:click="list.show = !list.show">
+          ＋{{ list.category }}
+        </button>
+        <div v-if="list.show">
+          <div v-if="!list.inputShow" v-on:click="list.inputShow = true">
+            <div class="listcate">
+              {{ list.category }}
+              <div class="list-delete" v-on:click="deleteList(index)"></div>
+            </div>
+          </div>
+          <div v-else>
+            <input
+              class="inputcatebutton"
+              type="text"
+              v-model="list.category"
+              v-on:keydown.enter="list.inputShow = false"
+            />
+          </div>
+          <TodoList></TodoList>
         </div>
+        <div v-else></div>
       </div>
     </div>
   </div>
@@ -79,17 +79,18 @@ export default {
 #checklist {
   width: 100%;
   height: 100%;
-  display: flex;
+  padding-top: 10px;
 }
 
 #todo {
-  width: 50%;
   display: flex;
   flex-wrap: wrap;
 }
 
 .todolist {
-  background-color: rgb(97, 97, 248);
+  background-color: rgb(211, 210, 223);
+  border-radius: 5px;
+  margin-top: 10px;
 }
 
 .listcate {
@@ -98,38 +99,55 @@ export default {
   margin: 0.5rem;
 }
 
+.list-delete:hover {
+  cursor: pointer;
+}
+
 .listcate:hover .list_delete {
   bottom: 4px;
   right: 4px;
   z-index: 16;
   opacity: 0.5;
-  color: #f00;
 }
 
 .listcate:hover .list-delete:after {
   content: "削除";
 }
 
-.input-container {
-  width: 500px;
-  height: 3rem;
-  background-color: rgb(97, 97, 248);
+.inputcatebutton {
+  margin: 5px;
+  padding: 3px;
+  border-width: 0;
+  border-radius: 3px;
+}
+
+.inputcatebutton:focus {
+  outline: 0;
+}
+
+#input-container {
+  width: 450px;
+  background-color: rgb(211, 210, 223);
+  border-radius: 5px;
+  padding: 5px;
 }
 
 .input-cate {
   width: 50%;
   border-radius: 4px;
-  color: #fff;
   font-size: 1em;
   border-width: 0px;
 }
 
-.list-button {
+.add-button,
+.cancel-button {
+  margin: 1px;
   padding: auto;
   color: #fff;
-  background-color: #2ab643;
+  background-color: rgb(108, 108, 243);
   border-radius: 4px;
   user-select: none;
+  border-width: 0;
 }
 
 .input-list {

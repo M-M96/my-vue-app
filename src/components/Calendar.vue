@@ -1,61 +1,96 @@
 <template>
   <div id="calendar-app">
-    <div id="input">
-      <input
-        type="text"
-        v-model="inputcal"
-        placeholder="入力してね"
-        class="input-cal"
-      />
-      <div v-on:click="addcal" class="cal-add">追加</div>
-      <div>{{ events }}</div>
-    </div>
     <div id="content">
-      <div id="button-area">
-        <button class="button" @click="prevMonth">＜</button>
-        <h2>カレンダー{{ displayDate }}</h2>
-        <button class="button" @click="nextMonth">＞</button>
-      </div>
-      <div id="CAL">
-        <div class="CAL-weekly">
-          <div class="CAL-youbi" v-for="n in 7" v-bind:key="n">
-            {{ youbi(n - 1) }}
+      <div id="calendar">
+        <div id="button-area">
+          <button class="button" @click="prevMonth">＜</button>
+          <h2>カレンダー{{ displayDate }}</h2>
+          <button class="button" @click="nextMonth">＞</button>
+        </div>
+        <div id="CAL">
+          <div class="CAL-weekly">
+            <div class="CAL-youbi" v-for="n in 7" v-bind:key="n">
+              {{ youbi(n - 1) }}
+            </div>
+          </div>
+          <div
+            class="CAL-weekly"
+            v-for="(week, index) in calendars"
+            v-bind:key="index"
+          >
+            <div
+              class="CAL-daily"
+              :class="{ outside: currentMonth !== day.month }"
+              v-for="(day, index) in week"
+              v-bind:key="index"
+              @drop="dragEnd($event, day.date)"
+              @dragover.prevent
+              @dblclick="openinputEvent(event), GET(day.date)"
+            >
+              <div class="CAL-day">
+                {{ day.day }}
+              </div>
+              <div v-for="dayEvent in day.dayEvents" v-bind:key="dayEvent.id">
+                <div
+                  class="CAL-event"
+                  v-if="dayEvent.width"
+                  :style="`width:${dayEvent.width}%;background-color:${dayEvent.color}`"
+                  draggable="true"
+                  @dragstart="dragStart($event, dayEvent.id)"
+                >
+                  {{ dayEvent.name }}
+                </div>
+                <div v-else style="height: 26px"></div>
+              </div>
+            </div>
           </div>
         </div>
-        <div
-          class="CAL-weekly"
-          v-for="(week, index) in calendars"
-          v-bind:key="index"
-        >
-          <div
-            class="CAL-daily"
-            :class="{ outside: currentMonth !== day.month }"
-            v-for="(day, index) in week"
-            v-bind:key="index"
-            @drop="dragEnd($event, day.date)"
-            @dragover.prevent
-            @click="GET(day.date)"
-            @dblclick="GET2(day.date)"
-          >
-            <div class="CAL-day">
-              {{ day.day }}
-            </div>
-            <div v-for="dayEvent in day.dayEvents" v-bind:key="dayEvent.id">
-              <div
-                class="CAL-event"
-                v-if="dayEvent.width"
-                :style="`width:${dayEvent.width}%;background-color:${dayEvent.color}`"
-                draggable="true"
-                @dragstart="dragStart($event, dayEvent.id)"
-              >
-                {{ dayEvent.name }}
-              </div>
-              <div v-else style="height: 26px"></div>
-            </div>
-          </div>
+      </div>
+      <div>
+        イベント
+        <div v-for="(event, index) in events" v-bind:key="event.id">
+          {{ event.name }}
+          <button v-on:click="deleteEvent(index)">×</button>
+          <div>{{ event.start }}～{{ event.end }}</div>
+          <div>メモ欄</div>
         </div>
       </div>
     </div>
+    <teleport to="#modal">
+      <div class="base" v-show="modal">
+        <div class="overlay" v-show="modal" @click="modal = false"></div>
+        <div class="content" v-show="modal">
+          <div>イベント追加</div>
+          <div>
+            <label> 開始日 </label>
+            <input v-model="form.start" />
+          </div>
+          <div>
+            <label> 終了日 </label>
+            <input v-model="form.end" />
+          </div>
+          <div>
+            <label>イベント</label>
+            <input
+              type="text"
+              v-model="inputEvent"
+              placeholder="入力してね"
+              class="input-cal"
+            />
+          </div>
+          <select v-model="selected">
+            <option
+              v-for="selectcolor in selectcolors"
+              v-bind:key="selectcolor"
+              :style="`background:${selectcolor}`"
+            >
+              {{ selectcolor }}
+            </option>
+          </select>
+          <div v-on:click="addEvent" class="cal-add">追加</div>
+        </div>
+      </div>
+    </teleport>
   </div>
 </template>
 
@@ -64,7 +99,25 @@ import moment from "moment"
 export default {
   data() {
     return {
-      inputcal: "",
+      modal: false,
+      inputEvent: "",
+      selected: "",
+      form: {
+        id: "",
+        name: "",
+        start: "a",
+        end: "",
+        color: "",
+      },
+      selectcolors: [
+        "#EF5350",
+        "#F48FB1",
+        "#2196F3",
+        "#00BCD4",
+        "#009688",
+        "#FFC107",
+        "#E0E0E0",
+      ],
       currentDate: moment(),
       events: [
         {
@@ -85,18 +138,29 @@ export default {
     }
   },
   methods: {
+    openinputEvent() {
+      // Object.assign(this.form, event)
+      this.modal = true
+    },
     GET(date) {
       console.log(date)
-      this.events.push({ start: date })
+      this.form.start = date
+      this.form.end = date
     },
-    GET2(date) {
-      console.log(date)
-      this.events.push({ end: date })
-    },
-    addcal() {
-      if (this.inputcal !== "") {
-        this.events.push({ name: this.inputcal })
+    addEvent() {
+      if (this.inputEvent !== "") {
+        this.events.push({
+          id: this.events.length + 1,
+          name: this.inputEvent,
+          start: this.form.start,
+          end: this.form.end,
+          color: this.selected,
+        })
+        this.modal = false
       }
+    },
+    deleteEvent(index) {
+      this.events.splice(index, 1)
     },
     prevMonth() {
       this.currentDate = moment(this.currentDate.subtract(1, "month"))
@@ -258,11 +322,18 @@ export default {
 <style scoped>
 #content {
   margin: auto 1rem 1rem 0;
-  width: 700px;
+  width: 100%;
   height: 700px;
+  display: flex;
 }
+
+#calendar {
+  width: 70%;
+}
+
 #button-area {
   display: flex;
+  max-width: 700px;
   background-color: rgba(138, 41, 228, 0.699);
   justify-content: space-between;
   color: white;
@@ -297,12 +368,13 @@ export default {
   border-bottom: 1px solid #e0e0e0;
   margin-right: -1px;
 }
-.CAL-day {
-  text-align: center;
+
+.CAL-daily:hover {
+  background-color: grey;
 }
 
-.CAL-day:hover {
-  background-color: blue;
+.CAL-day {
+  text-align: center;
 }
 
 .CAL-youbi {
@@ -325,5 +397,47 @@ export default {
   z-index: 1;
   border-radius: 4px;
   padding-left: 4px;
+}
+
+.cal-add {
+  width: 50px;
+  margin-top: 5px;
+  padding: 2px 0;
+  text-align: center;
+  color: #fff;
+  background-color: #2ab643;
+  border-radius: 4px;
+  user-select: none;
+}
+
+.cal-add:hover {
+  cursor: pointer;
+}
+
+.base {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  margin-top: 50px;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: gray;
+  opacity: 0.5;
+}
+
+.content {
+  background-color: white;
+  position: relative;
+  border-radius: 10px;
+  padding: 40px;
 }
 </style>

@@ -2,72 +2,78 @@
   <div class="todolist">
     <div id="list">
       <slot></slot>
-      <draggable v-model="todos" draggable=".todo">
-        <ul v-if="todos.length">
-          <li class="todo" v-for="(todo, index) in todos" v-bind:key="index">
-            <div v-if="!todo.todoShow" v-on:click="todo.todoShow = true">
-              <div class="todo__checkbox">
-                <input type="checkbox" v-model="todo.isDone" />
-              </div>
-              <div class="todo__text todo__text--done" v-if="todo.isDone">
-                {{ index + 1 }} : {{ todo.text }}
-              </div>
-              <div v-else class="todo__text">
-                {{ index + 1 }} : {{ todo.text }}
-              </div>
-              <div class="todo_delete" v-on:click="deleteTodo(index)"></div>
+      <!-- <draggable v-model="todos" draggable=".todo"> -->
+      <ul v-if="todos.length">
+        <li
+          class="todo-content"
+          v-for="(todo, index) in todos"
+          v-bind:key="index"
+        >
+          <div class="todo" v-if="!todo.todoShow">
+            <div class="todo__checkbox">
+              <input type="checkbox" v-model="todo.isDone" />
             </div>
-            <div v-else>
-              <input
-                type="text"
-                v-model="todo.text"
-                v-on:keydown.enter="todo.todoShow = false"
-              />
+            <div
+              class="todo__text todo__text--done"
+              v-if="todo.isDone"
+              v-on:click="todo.todoShow = true"
+            >
+              {{ index + 1 }} : {{ todo.text }}
             </div>
-          </li>
-        </ul>
-        <ul v-else>
-          <li style="list-style: none">ないよ</li>
-        </ul>
-        <div>
-          <div class="add">
+            <div v-else class="todo__text" v-on:click="todo.todoShow = true">
+              {{ index + 1 }} : {{ todo.text }}
+            </div>
+            <div class="todo_delete" v-on:click="deleteTodo(index)"></div>
+          </div>
+          <div v-else>
             <input
-              class="input-todo"
               type="text"
-              placeholder="入力"
-              v-model="inputTodo"
-              v-on:keydown.enter="addTodo"
+              v-model="todo.text"
+              v-on:keydown.enter="todo.todoShow = false"
             />
-            <div class="todo_add" v-on:click="addTodo">追加</div>
+          </div>
+        </li>
+      </ul>
+      <ul v-else>
+        <li style="list-style: none">無いよ～</li>
+      </ul>
+      <div>
+        <div class="add">
+          <input
+            class="input-todo"
+            type="text"
+            placeholder="入力"
+            v-model="inputTodo"
+            v-on:keydown.enter="addTodo"
+          />
+          <div class="todo_add" v-on:click="addTodo">追加</div>
+        </div>
+      </div>
+      <div>
+        <div>
+          削除済み項目
+          <div v-for="(deletedtodo, index) in deletedtodos" v-bind:key="index">
+            {{ deletedtodos }}
           </div>
         </div>
-        <div>{{ todos }}</div>
-      </draggable>
+      </div>
+      <!-- </draggable> -->
     </div>
   </div>
 </template>
 
 <script>
-// import _ from "lodash"
-import draggable from "vuedraggable"
+// import draggable from "vuedraggable"
+// import firebase from "firebase"
 export default {
-  components: { draggable },
+  // components: { draggable },
   data() {
     return {
       inputTodo: "",
       todos: [],
+      deletedtodos: [],
     }
   },
-  // watch: {
-  //   list: function () {
-  //     localStorage.list = JSON.stringify(this.list)
-  //   },
-  // },
-  // created: function () {
-  //   if (localStorage.list) {
-  //     this.list = JSON.parse(localStorage.list)
-  //   }
-  // },
   methods: {
     addTodo() {
       if (this.inputTodo !== "") {
@@ -78,9 +84,32 @@ export default {
         })
       }
     },
+
     deleteTodo(index) {
+      // this.deletedtodos.push(this.todo)
       this.todos.splice(index, 1)
     },
+    // postTodo() {
+    //   firebase.firestore().collection("todos").add({
+    //     text: this.todos.text,
+    //     isDone: this.todos.isDone,
+    //     todoShow: this.todos.todoShow,
+    //   })
+    // },
+    // created() {
+    //   firebase
+    //     .firestore()
+    //     .collection("todos")
+    //     .get()
+    //     .then((snapshot) => {
+    //       snapshot.docs.forEach((doc) => {
+    //         this.todos.push({
+    //           id: doc.id,
+    //           ...doc.data(),
+    //         })
+    //       })
+    //     })
+    // },
   },
 }
 </script>
@@ -89,9 +118,6 @@ export default {
 #list {
   min-width: 250px;
   width: 250px;
-  padding: 8px;
-  border-radius: 4px;
-  background-color: #e2e4e6;
   margin: 1rem;
 }
 
@@ -99,7 +125,7 @@ ul {
   padding: 0;
 }
 
-.todo,
+.todo-content,
 .add {
   height: 2em;
   width: 95%;
@@ -114,6 +140,10 @@ ul {
   align-items: center;
 }
 
+.todo {
+  display: flex;
+}
+
 .todo__text {
   margin-left: 1rem;
   /* text-align: left; */
@@ -125,7 +155,6 @@ ul {
 
 .todo_delete {
   margin-left: 2rem;
-  padding: 0.5rem 0.5rem;
   border-radius: 5px;
 }
 
@@ -141,12 +170,17 @@ ul {
   content: "削除";
 }
 
+.todo_delete:hover,
+.todo_add {
+  cursor: pointer;
+}
+
 .todo_add {
   width: 50px;
   padding: 2px 0;
   text-align: center;
   color: #fff;
-  background-color: #2ab643;
+  background-color: rgb(108, 108, 243);
   border-radius: 4px;
   user-select: none;
 }
@@ -162,7 +196,7 @@ ul {
   border-width: 0px;
 }
 
-.input-todo:focus {
+input:focus {
   outline: 0;
 }
 </style>
